@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Office Resources</title>
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    rel="stylesheet"
+  />
+  <link href="css/style.css?v=20260716-2" rel="stylesheet" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container d-flex align-items-center justify-content-between gap-3">
+      <div class="text-start">
+        <h1 id="site-title" class="fw-bold mb-1"></h1>
+        <p id="site-subtitle" class="lead text-secondary mb-0"></p>
+      </div>
+      <button class="btn btn-outline-secondary btn-sm flex-shrink-0 js-open-editor">
+        <i class="bi bi-lock"></i> Edit page
+      </button>
+    </div>
+  </header>
+
+  <main id="content" class="container py-4"></main>
+
+  <footer class="text-center text-secondary py-4 small">
+            cool office page &#x1F606 
+  </footer>
+
+  <!-- Lightbox for enlarging images -->
+  <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-content bg-transparent border-0">
+        <div class="modal-body p-0 text-center">
+          <img id="imageModalImg" src="" alt="" class="img-fluid rounded" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============== EDIT PANEL ============== -->
+  <div class="modal fade" id="adminModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title h5"><i class="bi bi-pencil-square"></i> Edit page content</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="alert alert-info small mb-4">
+            Changes save automatically to <strong>this computer's browser</strong>.
+            To publish them for everyone on a hosted site, click <strong>Export</strong> and
+            replace the site's <code>data.js</code> with the downloaded file.
+          </div>
+
+          <!-- Add / edit an item -->
+          <form id="itemForm" class="row g-3 align-items-end border rounded-3 p-3 mb-4 bg-light">
+            <div class="col-12">
+              <h3 class="h6 mb-0" id="formHeading">Add an item</h3>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Section</label>
+              <select class="form-select" id="f-section"></select>
+              <div class="form-text">Or type a new section name below to create one.</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">New section (optional)</label>
+              <input type="text" class="form-control" id="f-newsection" placeholder="e.g. Newsletters" />
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Type</label>
+              <select class="form-select" id="f-type">
+                <option value="form">Form (opens in new tab)</option>
+                <option value="link">Link (opens in new tab)</option>
+                <option value="pdf">PDF (open here or in new tab)</option>
+                <option value="image">Image (shows on page)</option>
+                <option value="video">Video (plays on page)</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Width</label>
+              <select class="form-select" id="f-size">
+                <option value="normal">Normal (third of a row)</option>
+                <option value="large">Large (half a row)</option>
+                <option value="full">Full width</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Title</label>
+              <input type="text" class="form-control" id="f-title" required />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Link / URL</label>
+              <div class="input-group">
+                <input type="text" class="form-control" id="f-url" placeholder="https://…  or  images/photo.jpg  or  files/form.pdf" required />
+                <button type="button" class="btn btn-outline-secondary" id="f-choose">
+                  <i class="bi bi-paperclip"></i> Choose file
+                </button>
+              </div>
+              <input type="file" id="f-file" class="d-none" accept=".pdf,image/*,video/*" />
+              <div class="form-text" id="f-url-hint"></div>
+              <div class="form-text text-success d-none" id="f-file-note"></div>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Description (optional)</label>
+              <textarea class="form-control" id="f-desc" rows="2"></textarea>
+            </div>
+
+            <div class="col-12 d-flex gap-2">
+              <button type="submit" class="btn btn-primary" id="f-submit">Add item</button>
+              <button type="button" class="btn btn-outline-secondary d-none" id="f-cancel">Cancel edit</button>
+            </div>
+          </form>
+
+          <!-- Current content with reorder/edit/delete -->
+          <h3 class="h6">Current items</h3>
+          <div id="adminList"></div>
+        </div>
+
+        <div class="modal-footer flex-wrap gap-2">
+          <button class="btn btn-success btn-sm" id="btn-export">
+            <i class="bi bi-download"></i> Export (publish file)
+          </button>
+          <button class="btn btn-outline-primary btn-sm" id="btn-import">
+            <i class="bi bi-upload"></i> Import
+          </button>
+          <input type="file" id="import-file" accept=".js,.json,application/json,text/javascript" class="d-none" />
+          <button class="btn btn-outline-danger btn-sm" id="btn-reset">
+            <i class="bi bi-arrow-counterclockwise"></i> Reset to defaults
+          </button>
+          <button class="btn btn-outline-secondary btn-sm" id="btn-passcode">
+            <i class="bi bi-key"></i> Change passcode
+          </button>
+          <button class="btn btn-secondary btn-sm ms-auto" data-bs-dismiss="modal">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="data.js?v=20260716-2"></script>
+  <script src="app.js?v=20260716-2"></script>
+</body>
+</html>
