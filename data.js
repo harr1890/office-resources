@@ -17,7 +17,7 @@ const SITE = {
           "type": "pdf",
           "title": "CBC Form",
           "description": "Criminal Background Check (CBC).",
-          "url": "files/CBC-CS-K12-Outreach-Fall-2026.pdf",
+          "url": "files/CBC CS K12 Outreach Fall 2026.pdf",
           "size": "normal"
         },
         {
