@@ -26,6 +26,12 @@ const SITE = {
           "description": "Consent form for use of photos and images.",
           "url": "files/Media Release Form.pdf",
           "size": "normal"
+        },
+        {
+          "type": "image",
+          "title": "test",
+          "url": "files/Image (11).jpeg",
+          "size": "normal"
         }
       ]
     },
@@ -37,6 +43,18 @@ const SITE = {
           "title": "Mentor Contract",
           "description": "Agree to all these. (will change later)",
           "url": "files/FS26 Mentor Contract.pdf",
+          "size": "normal"
+        }
+      ]
+    },
+    {
+      "title": "Required Videos",
+      "items": [
+        {
+          "type": "link",
+          "title": "Strengthening Safety",
+          "description": "As a new MSU policy, all employees and volunteers working on BPK12 youth programs must watch this video.",
+          "url": "https://mediaspace.msu.edu/id/1_oyxzxu3n",
           "size": "normal"
         }
       ]
