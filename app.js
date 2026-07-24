@@ -146,6 +146,11 @@
     var m = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
     return m ? m[1] : null;
   }
+  function kalturaId(url) {
+    // Kaltura MediaSpace URLs: mediaspace.*.edu/id/1_xxxxxx
+    var m = url.match(/mediaspace\.[^/]+\/id\/([\w]+)/);
+    return m ? m[1] : null;
+  }
   function isFileVideo(url) {
     return /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(url);
   }
@@ -196,6 +201,7 @@
     var inner;
     var yt = youTubeId(item.url);
     var vm = vimeoId(item.url);
+    var kal = kalturaId(item.url);
 
     if (yt) {
       inner =
@@ -205,12 +211,25 @@
       inner =
         '<div class="media-frame"><iframe src="https://player.vimeo.com/video/' + vm +
         '" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>';
+    } else if (kal) {
+      // Kaltura / MediaSpace embed
+      var host = item.url.match(/https?:\/\/([^/]+)/)[1];
+      inner =
+        '<div class="media-frame"><iframe src="https://' + host +
+        '/embed/secure/iframe/entryId/' + kal +
+        '" allow="autoplay; fullscreen; encrypted-media" allowfullscreen></iframe></div>';
     } else if (isFileVideo(item.url)) {
       inner =
         '<div class="media-frame"><video controls preload="metadata" src="' +
         esc(item.url) + '"></video></div>';
     } else {
-      return renderLinkCard(item, "Open Video", "bi-play-circle");
+      // Generic video thumbnail fallback — never just plain text
+      var safeUrl = esc(item.url);
+      inner =
+        '<a class="video-thumb-link" href="' + safeUrl + '" target="_blank" rel="noopener">' +
+        '<div class="video-thumb-fallback">' +
+        '<i class="bi bi-play-circle-fill"></i>' +
+        '</div></a>';
     }
 
     return (
@@ -223,21 +242,22 @@
   function renderPdfCard(item) {
     var safeUrl = esc(item.url);
     return (
-      '<div class="resource-card">' +
+      '<div class="resource-card js-pdf-card" data-pdf-url="' + safeUrl + '">' +
       '<div class="pdf-thumb" aria-hidden="true">' +
-      '<i class="bi bi-file-earmark-pdf-fill"></i><span>PDF</span>' +
-      "</div>" +
+      '<canvas class="pdf-thumb-canvas"></canvas>' +
+      '<div class="pdf-thumb-placeholder"><i class="bi bi-file-earmark-pdf-fill"></i><span>PDF</span></div>' +
+      '</div>' +
       '<div class="card-body">' +
       '<div class="type-tag mb-1"><i class="bi bi-file-earmark-pdf"></i> PDF</div>' +
-      '<h3 class="card-title">' + esc(item.title) + "</h3>" +
+      '<h3 class="card-title">' + esc(item.title) + '</h3>' +
       descHtml(item) +
       '<div class="d-flex flex-wrap gap-2">' +
       '<a class="btn btn-primary btn-resource" href="' + safeUrl +
       '">Open PDF <i class="bi bi-file-earmark-pdf"></i></a>' +
       '<a class="btn btn-outline-secondary btn-resource" href="' + safeUrl +
       '" target="_blank" rel="noopener">Open in new tab <i class="bi bi-box-arrow-up-right"></i></a>' +
-      "</div>" +
-      "</div></div>"
+      '</div>' +
+      '</div></div>'
     );
   }
 
@@ -297,6 +317,7 @@
     });
     content.innerHTML = html;
     wireImageZoom();
+    wirePdfThumbnails();
   }
 
   function wireImageZoom() {
@@ -311,6 +332,44 @@
       });
     });
   }
+
+  // ---- PDF thumbnail rendering via pdf.js ----------------------------
+
+  function wirePdfThumbnails() {
+    if (typeof pdfjsLib === "undefined") return;
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+    document.querySelectorAll(".js-pdf-card").forEach(function (card) {
+      var url = card.getAttribute("data-pdf-url");
+      var canvas = card.querySelector(".pdf-thumb-canvas");
+      var placeholder = card.querySelector(".pdf-thumb-placeholder");
+      if (!canvas || !url) return;
+
+      pdfjsLib.getDocument(url).promise.then(function (pdf) {
+        return pdf.getPage(1);
+      }).then(function (page) {
+        // Render at a scale that fills the thumbnail area nicely
+        var thumbWidth = card.querySelector(".pdf-thumb").offsetWidth || 400;
+        var viewport = page.getViewport({ scale: 1 });
+        var scale = thumbWidth / viewport.width;
+        var scaled = page.getViewport({ scale: scale });
+
+        canvas.width = scaled.width;
+        canvas.height = scaled.height;
+        var ctx = canvas.getContext("2d");
+        return page.render({ canvasContext: ctx, viewport: scaled }).promise;
+      }).then(function () {
+        // Thumbnail rendered — hide the fallback icon
+        canvas.classList.add("loaded");
+        if (placeholder) placeholder.style.display = "none";
+      }).catch(function () {
+        // PDF couldn't load — keep the static icon fallback
+      });
+    });
+  }
+
+
 
   // ==================================================================
   //  EDIT PANEL

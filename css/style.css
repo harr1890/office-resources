@@ -79,31 +79,73 @@ body {
   display: block;
 }
 
-/* A PDF gets its own static cover, just like an image card. It is deliberately
-   not a document preview, so a PDF can never contain this page inside itself. */
+/* ---- PDF thumbnail (live page-1 render via pdf.js, with icon fallback) ---- */
 .pdf-thumb {
   width: 100%;
   aspect-ratio: 16 / 9;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fff1f0, #fde6e4);
+  border-bottom: 1px solid #f3d2ce;
+}
+.pdf-thumb-canvas {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: auto;
+  display: none;
+}
+.pdf-thumb-canvas.loaded {
+  display: block;
+}
+.pdf-thumb-placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.55rem;
   color: #b42318;
-  background: linear-gradient(135deg, #fff1f0, #fde6e4);
-  border-bottom: 1px solid #f3d2ce;
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: 0.08em;
 }
-.pdf-thumb i {
+.pdf-thumb-placeholder i {
   font-size: 2.5rem;
 }
 
-/* Safety net for browsers that still have an older app.js cached. PDF and
-   legacy embed frames must never display a copy of the resource page. */
+
+
+/* Safety net for browsers that still have an older app.js cached. */
 .pdf-frame,
 .embed-frame {
   display: none !important;
+}
+
+/* ---- Video fallback thumbnail ---- */
+.video-thumb-fallback {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.video-thumb-fallback i {
+  font-size: 3.5rem;
+  color: rgba(255, 255, 255, 0.7);
+  transition: color 0.2s, transform 0.2s;
+}
+.video-thumb-link:hover .video-thumb-fallback i {
+  color: #fff;
+  transform: scale(1.15);
+}
+.video-thumb-link {
+  display: block;
+  text-decoration: none;
 }
 
 /* Responsive 16:9 frame for videos */
@@ -121,6 +163,9 @@ body {
   height: 100%;
   border: 0;
 }
+
+
+
 /* ---- Buttons ---- */
 .btn-resource {
   font-weight: 600;

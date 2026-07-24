@@ -26,12 +26,6 @@ const SITE = {
           "description": "Consent form for use of photos and images.",
           "url": "files/Media Release Form.pdf",
           "size": "normal"
-        },
-        {
-          "type": "image",
-          "title": "test",
-          "url": "files/Image (11).jpeg",
-          "size": "normal"
         }
       ]
     },
@@ -51,7 +45,7 @@ const SITE = {
       "title": "Required Videos",
       "items": [
         {
-          "type": "link",
+          "type": "video",
           "title": "Strengthening Safety",
           "description": "As a new MSU policy, all employees and volunteers working on BPK12 youth programs must watch this video.",
           "url": "https://mediaspace.msu.edu/id/1_oyxzxu3n",
