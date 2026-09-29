@@ -15,13 +15,6 @@ const SITE = {
       "items": [
         {
           "type": "pdf",
-          "title": "CBC Form",
-          "description": "Criminal Background Check (CBC).",
-          "url": "files/CBC CS K12 Outreach Fall 2026.pdf",
-          "size": "normal"
-        },
-        {
-          "type": "pdf",
           "title": "Image Release Form",
           "description": "Consent form for use of photos and images.",
           "url": "files/Media Release Form.pdf",
